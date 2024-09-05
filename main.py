@@ -1,3 +1,4 @@
+# AUTHOR: Alex aka NeuDam
 import requests, os, json, time
 from bs4 import BeautifulSoup
 
@@ -38,7 +39,12 @@ class Booker():
         main_books = table_container.find_all('tr')
         
         for first_books in main_books:
-            book_name = first_books.find('strong').text
+            book_name = first_books.find('strong').text.lower()
+            book_name = book_name.replace('á', 'a')
+            book_name = book_name.replace('é', 'e')
+            book_name = book_name.replace('í', 'i')
+            book_name = book_name.replace('ó', 'o')
+            book_name = book_name.replace('ú', 'u')
             book_url = first_books.find('a')['href']
             temp_data.append({"name": book_name, "url": book_url, "category": "most_wanted"})
 
@@ -58,7 +64,12 @@ class Booker():
             books_found = soup2.find_all('div', {'class': 'Libros_Container'})
             
             for book in books_found:
-                book_name = book.find('p', {'class': 'Libros_Titulo'}).text
+                book_name = book.find('p', {'class': 'Libros_Titulo'}).text.lower()
+                book_name = book_name.replace('á', 'a')
+                book_name = book_name.replace('é', 'e')
+                book_name = book_name.replace('í', 'i')
+                book_name = book_name.replace('ó', 'o')
+                book_name = book_name.replace('ú', 'u')
                 book_url = book.find('a', {'class': 'Libros_Boton_Dos'})['href']
                 book_category = category['category_name']
                 temp_data.append({"name": book_name, "url": book_url, "category": book_category})
@@ -66,7 +77,7 @@ class Booker():
             if i == 9:
                 time_stop = time.time()
                 time_lapsed = (time_start - time_stop) * -1
-                time_waiting = int(((len_category * time_lapsed / 10) - time_lapsed) / 60)
+                time_waiting = int(((len_category * time_lapsed / 10) - time_lapsed) / 60) + 1
                 time_start = time.time()
             if i > 10:
                 time_stop = time.time()
@@ -85,8 +96,24 @@ class Booker():
         return True if os.path.exists(DB_ROUTE) else False
         
 
-myBookInvoker = Booker(book_name='orgullo y prejuicio')
+print('''
+      CHOOSE A OPTION
+      1 - Update DB
+      2 - Find a book 
+      ''')
 
-db_exists = myBookInvoker.update_database()
+option = int(input('-> '))
 
-# myBookInvoker.find_database()
+if option == 1:
+    
+    myBookInvoker = Booker()
+    myBookInvoker.update_database()
+
+elif option == 2:
+    
+    myBookInvoker = Booker(book_name=input('-> '))
+    myBookInvoker.find_database()
+else:
+    print('The options doesnt exist')
+# db_exists = myBookInvoker.update_database()
+
